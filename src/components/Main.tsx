@@ -179,8 +179,9 @@ const Main = () => {
   };
 
   return (
-    <div className="px-8 grid gap-4">
-      <div>
+    <div className="px-8 py-6 grid gap-8 max-w-4xl mx-auto">
+      <div className="bg-white shadow-md rounded-2xl p-6 grid gap-2">
+        <h2 className="text-xl font-bold mb-2">User Dashboard</h2>
         <p>User's Collateral: {formatEther(userCollateral ?? BigInt(0))}</p>
         <p>User's Loan: {formatEther(userLoan ?? BigInt(0))}</p>
         <p>User's CLT Balance: {formatEther(userCLT ?? BigInt(0))}</p>
@@ -207,7 +208,8 @@ const Main = () => {
           </span>
         </p>
       </div>
-      <div>
+      <div className="bg-white rounded-2xl shadow p-6 grid gap-2">
+        <h2 className="text-xl font-bold text-gray-800">Protocol Stats</h2>
         <p>
           Available Borrow Token: {formatEther(availableBorrow ?? BigInt(0))}
         </p>
@@ -216,69 +218,74 @@ const Main = () => {
         <p>Total Collateral: {formatEther(totalCollateral ?? BigInt(0))}</p>
       </div>
 
-      {/* Add Collateral UI */}
-      <div className="flex items-center gap-4">
-        <p>Add Collateral</p>
-        <input
-          className="border-1"
-          type={"number"}
-          value={cltInput}
-          onChange={(e) => setCltInput(e.target.value)}
-        />
-        <button className="bg-blue-400 px-2 py-1 rounded-sm" onClick={addCLT}>
-          Add
-        </button>
-      </div>
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Add Collateral UI */}
+        <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-4">
+          <input
+            className="border rounded-lg p-2 flex-1"
+            type="number"
+            placeholder="Amount CLT"
+            value={cltInput}
+            onChange={(e) => setCltInput(e.target.value)}
+          />
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+            onClick={addCLT}
+          >
+            Add Collateral
+          </button>
+        </div>
 
-      {/* Borrow UI */}
-      <div className="flex items-center gap-4">
-        <p>Borrow BFI</p>
-        <input
-          className="border-1"
-          type={"number"}
-          value={borrowInput}
-          onChange={(e) => setBorrowInput(e.target.value)}
-        />
-        <button
-          className="bg-green-400 px-2 py-1 rounded-sm"
-          onClick={borrowBFI}
-        >
-          Borrow
-        </button>
-      </div>
+        {/* Borrow UI */}
+        <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-4">
+          <input
+            className="border rounded-lg p-2 flex-1"
+            type="number"
+            placeholder="Amount BFI"
+            value={borrowInput}
+            onChange={(e) => setBorrowInput(e.target.value)}
+          />
+          <button
+            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+            onClick={borrowBFI}
+          >
+            Borrow
+          </button>
+        </div>
 
-      {/* Repay UI */}
-      <div className="flex items-center gap-4">
-        <p>Repay Loan</p>
-        <input
-          className="border-1"
-          type={"number"}
-          value={repayInput}
-          onChange={(e) => setRepayInput(e.target.value)}
-        />
-        <button
-          className="bg-yellow-400 px-2 py-1 rounded-sm"
-          onClick={repayBFI}
-        >
-          Repay
-        </button>
-      </div>
+        {/* Repay UI */}
+        <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-4">
+          <input
+            className="border rounded-lg p-2 flex-1"
+            type="number"
+            placeholder="Amount BFI"
+            value={repayInput}
+            onChange={(e) => setRepayInput(e.target.value)}
+          />
+          <button
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg"
+            onClick={repayBFI}
+          >
+            Repay
+          </button>
+        </div>
 
-      {/* Withdraw Collateral UI */}
-      <div className="flex items-center gap-4">
-        <p>Withdraw Collateral</p>
-        <input
-          className="border-1"
-          type={"number"}
-          value={withdrawInput}
-          onChange={(e) => setWithdrawInput(e.target.value)}
-        />
-        <button
-          className="bg-red-400 px-2 py-1 rounded-sm"
-          onClick={withdrawCLT}
-        >
-          Withdraw
-        </button>
+        {/* Withdraw Collateral UI */}
+        <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-4">
+          <input
+            className="border rounded-lg p-2 flex-1"
+            type="number"
+            placeholder="Amount CLT"
+            value={withdrawInput}
+            onChange={(e) => setWithdrawInput(e.target.value)}
+          />
+          <button
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+            onClick={withdrawCLT}
+          >
+            Withdraw
+          </button>
+        </div>
       </div>
     </div>
   );
