@@ -180,25 +180,54 @@ const Main = () => {
 
   return (
     <div className="px-8 py-6 grid gap-8 max-w-4xl mx-auto">
-      <div className="bg-white shadow-md rounded-2xl p-6 grid gap-2">
-        <h2 className="text-xl font-bold mb-2">User Dashboard</h2>
-        <p>User's Collateral: {formatEther(userCollateral ?? BigInt(0))}</p>
-        <p>User's Loan: {formatEther(userLoan ?? BigInt(0))}</p>
-        <p>User's CLT Balance: {formatEther(userCLT ?? BigInt(0))}</p>
-        <p>User's BFI Balance: {formatEther(userBFI ?? BigInt(0))}</p>
-        <p>LTC of user: {Number(userLTC ?? 0)}</p>
-        <p>
-          Health Status:{" "}
+      <div className="bg-white shadow-lg rounded-2xl p-6 grid gap-4 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
+        <h2 className="text-2xl font-extrabold text-gray-800 mb-4 flex items-center gap-2">
+          <span className="w-2 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></span>
+          User Dashboard
+        </h2>
+
+        <div className="space-y-2 text-gray-700">
+          <p>
+            <span className="font-semibold">User's Collateral:</span>{" "}
+            {formatEther(userCollateral ?? BigInt(0))}
+          </p>
+          <p>
+            <span className="font-semibold">User's Loan:</span>{" "}
+            {formatEther(userLoan ?? BigInt(0))}
+          </p>
+          <p>
+            <span className="font-semibold">User's CLT Balance:</span>{" "}
+            {formatEther(userCLT ?? BigInt(0))}
+          </p>
+          <p>
+            <span className="font-semibold">User's BFI Balance:</span>{" "}
+            {formatEther(userBFI ?? BigInt(0))}
+          </p>
+          <p>
+            <span className="font-semibold">LTC of user:</span>{" "}
+            {Number(userLTC ?? 0)}
+          </p>
+        </div>
+
+        {/* Health Status */}
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <span className="font-semibold text-gray-700">Health Status:</span>
           <span
-            className={`px-2 py-1 rounded-md text-white ${
-              isHealthy ? "bg-green-500" : "bg-red-500"
+            className={`px-3 py-1 rounded-full text-sm font-semibold shadow-sm ${
+              isHealthy
+                ? "bg-green-100 text-green-700 border border-green-200"
+                : "bg-red-100 text-red-700 border border-red-200"
             }`}
           >
             {isHealthy ? "Healthy" : "Unhealthy"}
           </span>
-        </p>
-        <p>
-          Check Health (Simulated):{" "}
+        </div>
+
+        {/* Simulated Check */}
+        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <span className="font-semibold text-gray-700">
+            Check Health (Simulated):
+          </span>
           <span
             className={`font-bold ${
               checkHealthy ? "text-green-600" : "text-red-600"
@@ -206,36 +235,50 @@ const Main = () => {
           >
             {checkHealthy ? "Healthy" : "Unhealthy"}
           </span>
-        </p>
+        </div>
       </div>
-      <div className="bg-white rounded-2xl shadow p-6 grid gap-2">
-        <h2 className="text-xl font-bold text-gray-800">Protocol Stats</h2>
-        <p>
-          Available Borrow Token: {formatEther(availableBorrow ?? BigInt(0))}
-        </p>
-        <p>Residual Collateral: {formatEther(availableCLT ?? BigInt(0))}</p>
-        <p>Total Borrowed: {formatEther(totalBorrowed ?? BigInt(0))}</p>
-        <p>Total Collateral: {formatEther(totalCollateral ?? BigInt(0))}</p>
+
+      <div className="bg-gradient-to-br from-white via-gray-50 to-gray-100 rounded-2xl shadow-lg p-6 grid gap-4 border border-gray-100">
+        <h2 className="text-2xl font-bold text-gray-900 tracking-tight mb-2">
+          Protocol Stats
+        </h2>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col items-start hover:shadow-md transition">
+            <p className="text-sm text-gray-500">Available Borrow</p>
+            <p className="text-lg font-semibold text-blue-600">
+              {formatEther(availableBorrow ?? 0n)}{" "}
+              <span className="text-xs">BFI</span>
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col items-start hover:shadow-md transition">
+            <p className="text-sm text-gray-500">Available Collateral</p>
+            <p className="text-lg font-semibold text-green-600">
+              {formatEther(availableCLT ?? 0n)}{" "}
+              <span className="text-xs">CLT</span>
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col items-start hover:shadow-md transition">
+            <p className="text-sm text-gray-500">Total Borrowed</p>
+            <p className="text-lg font-semibold text-red-600">
+              {formatEther(totalBorrowed ?? 0n)}{" "}
+              <span className="text-xs">BFI</span>
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col items-start hover:shadow-md transition">
+            <p className="text-sm text-gray-500">Total Collateral</p>
+            <p className="text-lg font-semibold text-purple-600">
+              {formatEther(totalCollateral ?? 0n)}{" "}
+              <span className="text-xs">CLT</span>
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Add Collateral UI */}
-        <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-4">
-          <input
-            className="border rounded-lg p-2 flex-1"
-            type="number"
-            placeholder="Amount CLT"
-            value={cltInput}
-            onChange={(e) => setCltInput(e.target.value)}
-          />
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
-            onClick={addCLT}
-          >
-            Add Collateral
-          </button>
-        </div>
-
         {/* Borrow UI */}
         <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-4">
           <input
@@ -267,6 +310,23 @@ const Main = () => {
             onClick={repayBFI}
           >
             Repay
+          </button>
+        </div>
+
+        {/* Add Collateral UI */}
+        <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-4">
+          <input
+            className="border rounded-lg p-2 flex-1"
+            type="number"
+            placeholder="Amount CLT"
+            value={cltInput}
+            onChange={(e) => setCltInput(e.target.value)}
+          />
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+            onClick={addCLT}
+          >
+            Add Collateral
           </button>
         </div>
 
