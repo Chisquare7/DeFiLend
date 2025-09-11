@@ -1,15 +1,60 @@
-import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import {
+  useAccount,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useWatchContractEvent,
+} from "wagmi";
 import contracts from "../contracts";
 import { formatEther, parseEther, zeroAddress } from "viem";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Main = () => {
   const [cltInput, setCltInput] = useState("");
-  const { address: connectedAccount } = useAccount();
+  const { address: connectedAccount, chain } = useAccount();
   const { writeContractAsync } = useWriteContract();
+  const [pendingTx, setPendingTx] = useState<`0x${string}` | null>(null);
   const [borrowInput, setBorrowInput] = useState("");
   const [repayInput, setRepayInput] = useState("");
   const [withdrawInput, setWithdrawInput] = useState("");
+
+  // This is for auto-chain detection
+  useEffect(() => {
+    if (chain) {
+      console.log("Connected chain:", chain.name);
+    }
+  }, [chain]);
+
+  // This is for Transaction state (waiting for mining)
+  const { isLoading: isMining, isSuccess: isMined } =
+    useWaitForTransactionReceipt({
+      hash: pendingTx ?? undefined,
+    });
+
+  useEffect(() => {
+    if (isMined) {
+      alert("Transaction confirmed on-chain!");
+      setPendingTx(null);
+    }
+  }, [isMined]);
+
+  // Event handling for transactions
+
+  useWatchContractEvent({
+    ...contracts.borrowFi,
+    eventName: "Borrowed",
+    onLogs: (logs) => {
+      console.log("Borrow Event:", logs);
+    },
+  });
+
+  useWatchContractEvent({
+    ...contracts.borrowFi,
+    eventName: "CollateralAdded",
+    onLogs: (logs) => {
+      console.log("Collateral Added:", logs);
+    },
+  });
 
   const { data: totalBorrowed } = useReadContract({
     ...contracts.borrowFi,
@@ -89,7 +134,7 @@ const Main = () => {
           args: [parsedAmount],
         });
         if (txHash) {
-          alert("Add Collateral Successful!");
+          setPendingTx(txHash);
         } else {
           throw new Error("Add Collateral failed!");
         }
@@ -107,13 +152,15 @@ const Main = () => {
         });
 
         if (txHash) {
+          setPendingTx(txHash);
           await _addClt();
         }
       } else {
         await _addClt();
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error("Add Collateral error:", err);
+      alert(`Add Collateral failed: ${err.message ?? err}`);
     }
   };
 
@@ -121,13 +168,19 @@ const Main = () => {
   const borrowBFI = async () => {
     try {
       const parsedAmount = parseEther(borrowInput);
+
+      if (!isHealthy)
+        throw new Error("Health ratio not sufficient for borrowing");
+
       const txHash = await writeContractAsync({
         ...contracts.borrowFi,
         functionName: "borrow",
         args: [parsedAmount],
       });
-      if (txHash) alert("Borrow Successful!");
-    } catch (err) {
+
+      setPendingTx(txHash);
+    } catch (err: any) {
+      alert(`Borrow failed: ${err.message}`);
       console.error(err);
     }
   };
@@ -149,7 +202,8 @@ const Main = () => {
           functionName: "approve",
           args: [contracts.borrowFi.address, parsedAmount],
         });
-        if (!approveTx) throw new Error("Approval failed");
+        setPendingTx(approveTx);
+        return;
       }
 
       const txHash = await writeContractAsync({
@@ -157,8 +211,10 @@ const Main = () => {
         functionName: "repay",
         args: [parsedAmount],
       });
-      if (txHash) alert("Repay Successful!");
-    } catch (err) {
+
+      setPendingTx(txHash);
+    } catch (err: any) {
+      alert(`Repay failed: ${err.message}`);
       console.error(err);
     }
   };
@@ -172,7 +228,8 @@ const Main = () => {
         functionName: "withdrawCollateral",
         args: [parsedAmount],
       });
-      if (txHash) alert("Withdraw Collateral Successful!");
+
+      setPendingTx(txHash);
     } catch (err) {
       console.error(err);
     }
@@ -180,6 +237,11 @@ const Main = () => {
 
   return (
     <div className="px-8 py-6 grid gap-8 max-w-4xl mx-auto">
+      {isMining && (
+        <div className="bg-yellow-100 text-yellow-700 p-2 rounded mb-4">
+          ⏳ Waiting for transaction to confirm...
+        </div>
+      )}
       <div className="bg-white shadow-lg rounded-2xl p-6 grid gap-4 border border-gray-100 hover:shadow-xl transition-shadow duration-300">
         <h2 className="text-2xl font-extrabold text-gray-800 mb-4 flex items-center gap-2">
           <span className="w-2 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></span>
